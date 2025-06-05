@@ -21,7 +21,7 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"
 			value="com.mysql.jdbc.Driver"></property>
-		<property name="url" value="jdbc:mysql://localhost:3306/emp99"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/pj_team"></property>
 		<property name="username" value="root"></property>
 		<property name="password" value=""></property>
 	</bean>
@@ -33,4 +33,26 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	<bean id="dao" class="com.javatpoint.dao.EmpDao">
 		<property name="template" ref="jt"></property>
 	</bean>
+	
+	<bean id="customerDao" class="com.javatpoint.dao.CustomerDao">
+    <property name="template" ref="jt"></property>
+	</bean>
+	
+	<bean id="supplierDao" class="com.javatpoint.dao.SupplierDao">
+    <property name="template" ref="jt"></property>
+	</bean>
+	
+	<bean id="stockInDao" class="com.javatpoint.dao.StockInDao">
+    <property name="template" ref="jt"></property>
+	</bean>
+	
+	<bean id="stockOutDao" class="com.javatpoint.dao.StockOutDao">
+    <property name="template" ref="jt"></property>
+	</bean>
+	
+	<bean id="stockBalanceDao" class="com.javatpoint.dao.StockBalanceDao">
+    <property name="template" ref="jt"></property>
+	</bean>
+	
+	
 </beans>

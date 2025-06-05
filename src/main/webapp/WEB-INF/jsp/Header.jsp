@@ -99,11 +99,7 @@ body {
 		<!-- Sidebar -->
 		<div class="sidebar">
 			<div class="nav-menu">
-				<div class="nav-item ${activePage == 'customer' ? 'active' : ''}">
-					<a href="${pageContext.request.contextPath}/CustomerInfo"
-						class="nav-link ${activePage == 'customer' ? 'text-danger' : ''}">Customer
-						Info</a>
-				</div>
+				
 				<div class="nav-item ${activePage == 'supplier' ? 'active' : ''}">
 					<a href="${pageContext.request.contextPath}/SupplierInfo"
 						class="nav-link ${activePage == 'supplierinfo' ? 'text-danger' : ''}">Supplier

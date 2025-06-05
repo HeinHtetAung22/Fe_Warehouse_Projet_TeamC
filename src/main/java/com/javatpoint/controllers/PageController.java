@@ -4,138 +4,278 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.javatpoint.beans.Customer;
 import com.javatpoint.beans.Emp;
+import com.javatpoint.beans.StockBalance;
+import com.javatpoint.beans.StockIn;
+import com.javatpoint.beans.StockOut;
+import com.javatpoint.beans.Supplier;
+import com.javatpoint.dao.CustomerDao;
 import com.javatpoint.dao.EmpDao;
-
-
+import com.javatpoint.dao.StockBalanceDao;
+import com.javatpoint.dao.StockInDao;
+import com.javatpoint.dao.StockOutDao;
+import com.javatpoint.dao.SupplierDao;
 
 @Controller
 public class PageController {
 
-    @Autowired
-    EmpDao dao;
-    
-    @RequestMapping("/CustomerInfo")
-    public String customerInfo(Model model) {
-        model.addAttribute("pageTitle", "Customer Information");
-        model.addAttribute("activePage", "customer");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/CustomerInfo.jsp");
-        return "Header";
-    }
+	@Autowired
+	EmpDao dao;
 
-    @RequestMapping("/SupplierInfo")
-    public String supplierInfo(Model model) {
-        // Add any necessary model attributes
-    	 model.addAttribute("pageTitle", "Supplier Information");
-         model.addAttribute("activePage", "supplierinfo");
-         model.addAttribute("contentPage", "/WEB-INF/jsp/SupplierInfo.jsp");
-         return "Header";
-        
-    }
+	@Autowired
+	private CustomerDao customerDao;
 
-    @RequestMapping("/StockInReport")
-    public String stockInReport(Model model) {
-    	 model.addAttribute("pageTitle", "Stock In Report");
-         model.addAttribute("activePage", "stockinreport");
-         model.addAttribute("contentPage", "/WEB-INF/jsp/StockInReport.jsp");
-         return "Header";
-        
-    }
+	@Autowired
+	private SupplierDao supplierDao;
 
-    @RequestMapping("/StockOutReport")
-    public String stockOutReport(Model model) {
-        // Add any necessary model attributes
-    	model.addAttribute("pageTitle", "Stock Out Report");
-        model.addAttribute("activePage", "stockoutreport");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/StockOutReport.jsp");
-        return "Header";
-       
-    }
+	@Autowired
+	private StockInDao stockInDao;
 
-    @RequestMapping("/StockBalanceReport")
-    public String stockBalance(Model model) {
-    	model.addAttribute("pageTitle", "Stock Balance");
-        model.addAttribute("activePage", "stockbalancereport");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/StockBalanceReport.jsp");
-        return "Header";
-    }
 
-    @RequestMapping("/UserInsert")
-    public String userInsert(Model model) {
-    	model.addAttribute("pageTitle", "UserInsert");
-        model.addAttribute("activePage", "userinsert");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/UserInsert.jsp");
-        return "Header";
-    }
+	@Autowired
+	private StockOutDao stockOutDao;
+	
 
-    @RequestMapping("/UserView")
-    public String userView(Model model) {
-    	model.addAttribute("pageTitle", "UserView");
-        model.addAttribute("activePage", "userview");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/UserView.jsp");
-        return "Header";
-    }
+	@Autowired
+	private StockBalanceDao stockBalanceDao;
+	
+	
+//    @RequestMapping("/CustomerInfo")
+//    public String customerInfo(Model model) {
+//        model.addAttribute("pageTitle", "Customer Information");
+//        model.addAttribute("activePage", "customer");
+//        model.addAttribute("contentPage", "/WEB-INF/jsp/CustomerInfo.jsp");
+//        return "Header";
+//    }
 
-    @RequestMapping("/Update")
-    public String update(Model model) {
-    	
-    	model.addAttribute("pageTitle", "Update");
-        model.addAttribute("activePage", "update");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/Update.jsp");
-        return "Header";
-    }
+	@RequestMapping(value = { "/SupplierInfo", "/SupplierInfo/{pageid}" })
+	public String supplierInfo(@PathVariable(required = false) Integer pageid, Model model) {
 
-    @RequestMapping("/Login")
-    public String login(Model model) {
-    	model.addAttribute("pageTitle", "Login");
-        model.addAttribute("activePage", "login");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/Login.jsp");
-        return "Header";
-    }
+		// Set default page if not specified
+		if (pageid == null) {
+			pageid = 1;
+		}
 
-    @RequestMapping("/ChangePassword")
-    public String changePassword(Model model) {
-        model.addAttribute("pageTitle", "Change Password");
-        model.addAttribute("activePage", "changepassword");
-        model.addAttribute("contentPage", "/WEB-INF/jsp/ChangePassword.jsp");
-        return "Header";
-    }
+		int recordsPerPage = 5; // Number of records per page
 
-    @RequestMapping("/ForgetPassword")
-    public String forgetPassword(Model model) {
-    	 model.addAttribute("pageTitle", "Forget Password");
-         model.addAttribute("activePage", "forgetpassword");
-         model.addAttribute("contentPage", "/WEB-INF/jsp/ForgetPassword.jsp");
-         return "Header";
-    }
-    
-    
-    
-    
-    
-    
-    @RequestMapping("/empform")  
-    public String showform(Model m){  
-    	m.addAttribute("emp", new Emp());
-    	return "viewemp"; 
-    } 
-    
-    @RequestMapping(value = "/viewemp/{pageid}")
-    public String edit(@PathVariable int pageid, Model m) {
-        int total = 5;
-        if (pageid == 1) {
-            // do nothing, just use pageid=1
-        } else {
-            pageid = (pageid - 1) * total + 1;
-        }
-        
-        System.out.println(pageid);
-        List<Emp> list = dao.getEmployeesByPage(pageid, total);
-        m.addAttribute("msg", list);
+		// Get paginated suppliers
+		List<Supplier> suppliers = supplierDao.getSuppliersByPage(pageid, recordsPerPage);
 
-        return "viewemp";
-    }
+		// Calculate total pages
+		int totalRecords = supplierDao.countSuppliers();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		// Add data to model
+		model.addAttribute("pageTitle", "Supplier Information");
+		model.addAttribute("activePage", "supplierinfo");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/SupplierInfo.jsp");
+		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
+	}
+
+	@RequestMapping(value = { "/StockInReport", "/StockInReport/{pageid}" })
+	public String stockInReport(@PathVariable(required = false) Integer pageid, Model model) {
+
+		// Set default page if not specified
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5; // Number of records per page
+
+		// Get paginated stock ins
+		List<StockIn> stockIns = stockInDao.getStockInsByPage(pageid, recordsPerPage);
+
+		// Calculate total pages
+		int totalRecords = stockInDao.countStockIns();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		// Add data to model
+		model.addAttribute("pageTitle", "Stock In Report");
+		model.addAttribute("activePage", "stockinreport");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/StockInReport.jsp");
+		model.addAttribute("stockIns", stockIns);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
+	}
+
+	@RequestMapping(value = { "/StockOutReport", "/StockOutReport/{pageid}" })
+	public String stockOutReport(@PathVariable(required = false) Integer pageid, Model model) {
+
+		// Set default page if not specified
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5; // Number of records per page
+
+		// Get paginated stock outs
+		List<StockOut> stockOuts = stockOutDao.getStockOutsByPage(pageid, recordsPerPage);
+
+		// Calculate total pages
+		int totalRecords = stockOutDao.countStockOuts();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		// Add data to model
+		model.addAttribute("pageTitle", "Stock Out Report");
+		model.addAttribute("activePage", "stockoutreport");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/StockOutReport.jsp");
+		model.addAttribute("stockOuts", stockOuts);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
+	}
+
+	@RequestMapping(value = {"/StockBalanceReport", "/StockBalanceReport/{pageid}"})
+	public String stockBalanceReport(
+	        @PathVariable(required = false) Integer pageid,
+	        Model model) {
+	    
+	    // Set default page if not specified
+	    if (pageid == null) {
+	        pageid = 1;
+	    }
+	    
+	    int recordsPerPage = 5; // Number of records per page
+	    
+	    // Get paginated stock balances
+	    List<StockBalance> stockBalances = stockBalanceDao.getStockBalancesByPage(pageid, recordsPerPage);
+	    
+	    // Calculate total pages
+	    int totalRecords = stockBalanceDao.countStockBalances();
+	    int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+	    
+	    // Add data to model
+	    model.addAttribute("pageTitle", "Stock Balance Report");
+	    model.addAttribute("activePage", "stockbalancereport");
+	    model.addAttribute("contentPage", "/WEB-INF/jsp/StockBalanceReport.jsp");
+	    model.addAttribute("stockBalances", stockBalances);
+	    model.addAttribute("currentPage", pageid);
+	    model.addAttribute("totalPages", totalPages);
+	    
+	    return "Header";
+	}
+
+	@RequestMapping("/UserInsert")
+	public String userInsert(Model model) {
+		model.addAttribute("pageTitle", "UserInsert");
+		model.addAttribute("activePage", "userinsert");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/UserInsert.jsp");
+		return "Header";
+	}
+
+//    @RequestMapping("/UserView")
+//    public String userView(Model model) {
+//    	model.addAttribute("pageTitle", "UserView");
+//        model.addAttribute("activePage", "userview");
+//        model.addAttribute("contentPage", "/WEB-INF/jsp/UserView.jsp");
+//        return "Header";
+//    }
+//    @RequestMapping("/UserView")
+//        public String userView(Model model) {
+//            // Get all customers from DAO
+//            List<Customer> customers = customerDao.getAllCustomers();
+//            
+//            // Add data to model
+//            model.addAttribute("pageTitle", "UserView");
+//            model.addAttribute("activePage", "userview");
+//            model.addAttribute("contentPage", "/WEB-INF/jsp/UserView.jsp");
+//            model.addAttribute("customers", customers); // Add customer list
+//            
+//            return "Header";
+//        }
+
+	@RequestMapping(value = { "/UserView", "/UserView/{pageid}" })
+	public String userView(@PathVariable(required = false) Integer pageid, Model model) {
+
+		// Set default page if not specified
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5; // Number of records per page
+
+		// Get paginated customers
+		List<Customer> customers = customerDao.getCustomersByPage(pageid, recordsPerPage);
+
+		// Calculate total pages
+		int totalRecords = customerDao.countCustomers();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		// Add data to model
+		model.addAttribute("pageTitle", "UserView");
+		model.addAttribute("activePage", "userview");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/UserView.jsp");
+		model.addAttribute("customers", customers);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
+	}
+
+	@RequestMapping("/Update")
+	public String update(Model model) {
+
+		model.addAttribute("pageTitle", "Update");
+		model.addAttribute("activePage", "update");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/Update.jsp");
+		return "Header";
+	}
+
+	@RequestMapping("/Login")
+	public String login(Model model) {
+		model.addAttribute("pageTitle", "Login");
+		model.addAttribute("activePage", "login");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/Login.jsp");
+		return "Header";
+	}
+
+	@RequestMapping("/ChangePassword")
+	public String changePassword(Model model) {
+		model.addAttribute("pageTitle", "Change Password");
+		model.addAttribute("activePage", "changepassword");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/ChangePassword.jsp");
+		return "Header";
+	}
+
+	@RequestMapping("/ForgetPassword")
+	public String forgetPassword(Model model) {
+		model.addAttribute("pageTitle", "Forget Password");
+		model.addAttribute("activePage", "forgetpassword");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/ForgetPassword.jsp");
+		return "Header";
+	}
+
+	@RequestMapping("/empform")
+	public String showform(Model m) {
+		m.addAttribute("emp", new Emp());
+		return "viewemp";
+	}
+
+	@RequestMapping(value = "/viewemp/{pageid}")
+	public String edit(@PathVariable int pageid, Model m) {
+		int total = 5;
+		if (pageid == 1) {
+			// do nothing, just use pageid=1
+		} else {
+			pageid = (pageid - 1) * total + 1;
+		}
+
+		System.out.println(pageid);
+		List<Emp> list = dao.getEmployeesByPage(pageid, total);
+		m.addAttribute("msg", list);
+
+		return "viewemp";
+	}
 }

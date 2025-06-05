@@ -95,7 +95,7 @@
 </head>
 
 <body>
- <a href="viewemp/1">Click here for pagination form</a>
+ <!--  <a href="viewemp/1">Click here for pagination form</a> -->
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg custom-navbar">
         <div class="container-fluid">
