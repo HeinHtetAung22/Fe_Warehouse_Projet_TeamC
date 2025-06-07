@@ -87,7 +87,7 @@ body {
 	<nav class="navbar navbar-expand-lg custom-navbar">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#"> <img
-				src="/jsp/npg.png"
+				src="${pageContext.request.contextPath}/resources/images/npg.png"
 				alt="Logo" width="90" height="50" />
 			</a>
 			<div class="mx-auto text-white fw-bold fs-4">Ngwe Pone Gyi</div>

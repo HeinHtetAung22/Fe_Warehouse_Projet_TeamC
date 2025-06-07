@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.javatpoint.beans.Customer;
 import com.javatpoint.beans.Emp;
@@ -36,15 +39,12 @@ public class PageController {
 	@Autowired
 	private StockInDao stockInDao;
 
-
 	@Autowired
 	private StockOutDao stockOutDao;
-	
 
 	@Autowired
 	private StockBalanceDao stockBalanceDao;
-	
-	
+
 //    @RequestMapping("/CustomerInfo")
 //    public String customerInfo(Model model) {
 //        model.addAttribute("pageTitle", "Customer Information");
@@ -53,9 +53,36 @@ public class PageController {
 //        return "Header";
 //    }
 
+//	@RequestMapping(value = { "/SupplierInfo", "/SupplierInfo/{pageid}" })
+//	public String supplierInfo(@PathVariable(required = false) Integer pageid, Model model) {
+//
+//		// Set default page if not specified
+//		if (pageid == null) {
+//			pageid = 1;
+//		}
+//
+//		int recordsPerPage = 5; // Number of records per page
+//
+//		// Get paginated suppliers
+//		List<Supplier> suppliers = supplierDao.getSuppliersByPage(pageid, recordsPerPage);
+//
+//		// Calculate total pages
+//		int totalRecords = supplierDao.countSuppliers();
+//		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+//
+//		// Add data to model
+//		model.addAttribute("pageTitle", "Supplier Information");
+//		model.addAttribute("activePage", "supplierinfo");
+//		model.addAttribute("contentPage", "/WEB-INF/jsp/SupplierInfo.jsp");
+//		model.addAttribute("suppliers", suppliers);
+//		model.addAttribute("currentPage", pageid);
+//		model.addAttribute("totalPages", totalPages);
+//
+//		return "Header";
+//	}
+
 	@RequestMapping(value = { "/SupplierInfo", "/SupplierInfo/{pageid}" })
 	public String supplierInfo(@PathVariable(required = false) Integer pageid, Model model) {
-
 		// Set default page if not specified
 		if (pageid == null) {
 			pageid = 1;
@@ -79,6 +106,89 @@ public class PageController {
 		model.addAttribute("totalPages", totalPages);
 
 		return "Header";
+	}
+
+	@RequestMapping(value = { "/SearchSupplierInfo", "/SearchSupplierInfo/{pageid}" }, method = RequestMethod.GET)
+	public String searchSupplierInfo(@PathVariable(required = false) Integer pageid,
+			@RequestParam("searchQuery") String query, Model model) {
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5;
+
+		// Search suppliers with pagination
+		List<Supplier> suppliers = supplierDao.searchSuppliers(query, pageid, recordsPerPage);
+
+		// Count total search results
+		int totalRecords = supplierDao.countSearchResults(query);
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		model.addAttribute("suppliers", suppliers);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("searchQuery", query); // Needed to persist the query in the view
+		model.addAttribute("pageTitle", "Search Results");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/SupplierInfo.jsp");
+		model.addAttribute("activePage", "supplierinfo");
+
+		return "Header";
+	}
+
+	@RequestMapping("/SupplierInsertpage")
+	public String supplierInsertPage(Model model) {
+
+		model.addAttribute("pageTitle", "SupplierInsert");
+		model.addAttribute("activePage", "supplierinsert");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/supplierInsert.jsp");
+		return "Header";
+	}
+
+	// Process insert form
+	@RequestMapping(value = "/SupplierInsert", method = RequestMethod.POST)
+	public String saveSupplier(@ModelAttribute("supplier") Supplier supplier, Model model) {
+		int result = supplierDao.save(supplier);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Supplier added successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to add supplier!");
+		}
+		return "redirect:/SupplierInfo";
+	}
+
+	// Show edit form
+	@RequestMapping("/SupplierEdit/{id}")
+	public String supplierEditPage(@PathVariable int id, Model model) {
+		Supplier supplier = supplierDao.getSupplierById(id);
+		model.addAttribute("supplier", supplier);
+		model.addAttribute("pageTitle", "Edit Supplier");
+		model.addAttribute("activePage", "supplieredit");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/supplierEdit.jsp");
+		return "Header";
+	}
+
+	// Handle edit form submission
+	@RequestMapping(value = "/SupplierUpdate", method = RequestMethod.POST)
+	public String updateSupplier(@ModelAttribute("supplier") Supplier supplier, Model model) {
+		int result = supplierDao.update(supplier);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Supplier updated successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to update supplier!");
+		}
+		return "redirect:/SupplierInfo";
+	}
+
+	// Handle delete
+	@RequestMapping("/SupplierDelete/{id}")
+	public String deleteSupplier(@PathVariable int id, Model model) {
+		int result = supplierDao.delete(id);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Supplier deleted successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to delete supplier!");
+		}
+		return "redirect:/SupplierInfo";
 	}
 
 	@RequestMapping(value = { "/StockInReport", "/StockInReport/{pageid}" })
@@ -137,34 +247,32 @@ public class PageController {
 		return "Header";
 	}
 
-	@RequestMapping(value = {"/StockBalanceReport", "/StockBalanceReport/{pageid}"})
-	public String stockBalanceReport(
-	        @PathVariable(required = false) Integer pageid,
-	        Model model) {
-	    
-	    // Set default page if not specified
-	    if (pageid == null) {
-	        pageid = 1;
-	    }
-	    
-	    int recordsPerPage = 5; // Number of records per page
-	    
-	    // Get paginated stock balances
-	    List<StockBalance> stockBalances = stockBalanceDao.getStockBalancesByPage(pageid, recordsPerPage);
-	    
-	    // Calculate total pages
-	    int totalRecords = stockBalanceDao.countStockBalances();
-	    int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-	    
-	    // Add data to model
-	    model.addAttribute("pageTitle", "Stock Balance Report");
-	    model.addAttribute("activePage", "stockbalancereport");
-	    model.addAttribute("contentPage", "/WEB-INF/jsp/StockBalanceReport.jsp");
-	    model.addAttribute("stockBalances", stockBalances);
-	    model.addAttribute("currentPage", pageid);
-	    model.addAttribute("totalPages", totalPages);
-	    
-	    return "Header";
+	@RequestMapping(value = { "/StockBalanceReport", "/StockBalanceReport/{pageid}" })
+	public String stockBalanceReport(@PathVariable(required = false) Integer pageid, Model model) {
+
+		// Set default page if not specified
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5; // Number of records per page
+
+		// Get paginated stock balances
+		List<StockBalance> stockBalances = stockBalanceDao.getStockBalancesByPage(pageid, recordsPerPage);
+
+		// Calculate total pages
+		int totalRecords = stockBalanceDao.countStockBalances();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		// Add data to model
+		model.addAttribute("pageTitle", "Stock Balance Report");
+		model.addAttribute("activePage", "stockbalancereport");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/StockBalanceReport.jsp");
+		model.addAttribute("stockBalances", stockBalances);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
 	}
 
 	@RequestMapping("/UserInsert")
