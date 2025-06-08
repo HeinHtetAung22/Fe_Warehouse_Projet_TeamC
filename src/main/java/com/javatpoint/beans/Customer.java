@@ -1,17 +1,17 @@
 package com.javatpoint.beans;
 
 public class Customer {
-    private String customerID;
+    private int customerID;
     private String customerName;
     private String customerPh;
     private String customerAddress;
 
     // Getters and Setters
-    public String getCustomerID() {
+    public int getCustomerID() {
         return customerID;
     }
 
-    public void setCustomerID(String customerID) {
+    public void setCustomerID(int customerID) {
         this.customerID = customerID;
     }
 
@@ -37,5 +37,9 @@ public class Customer {
 
     public void setCustomerAddress(String customerAddress) {
         this.customerAddress = customerAddress;
+    }
+    // Helper method to get formatted ID
+    public String getFormattedId() {
+        return "CUST" + this.customerID;
     }
 }

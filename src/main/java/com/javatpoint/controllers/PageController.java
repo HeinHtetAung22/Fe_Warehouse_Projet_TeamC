@@ -275,13 +275,13 @@ public class PageController {
 		return "Header";
 	}
 
-	@RequestMapping("/UserInsert")
-	public String userInsert(Model model) {
-		model.addAttribute("pageTitle", "UserInsert");
-		model.addAttribute("activePage", "userinsert");
-		model.addAttribute("contentPage", "/WEB-INF/jsp/UserInsert.jsp");
-		return "Header";
-	}
+//	@RequestMapping("/UserInsert")
+//	public String userInsert(Model model) {
+//		model.addAttribute("pageTitle", "UserInsert");
+//		model.addAttribute("activePage", "userinsert");
+//		model.addAttribute("contentPage", "/WEB-INF/jsp/UserInsert.jsp");
+//		return "Header";
+//	}
 
 //    @RequestMapping("/UserView")
 //    public String userView(Model model) {
@@ -304,6 +304,16 @@ public class PageController {
 //            return "Header";
 //        }
 
+	
+	@RequestMapping("/UserInsert")
+	public String userInsertPage(Model model) {
+
+		model.addAttribute("pageTitle", "UserInsert(Admin,Employee)");
+		model.addAttribute("activePage", "userinsert");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/UserInsert.jsp");
+		return "Header";
+	}
+	
 	@RequestMapping(value = { "/UserView", "/UserView/{pageid}" })
 	public String userView(@PathVariable(required = false) Integer pageid, Model model) {
 
@@ -330,6 +340,102 @@ public class PageController {
 		model.addAttribute("totalPages", totalPages);
 
 		return "Header";
+	}
+
+	@RequestMapping(value = { "/CustomerInfo", "/CustomerInfo/{pageid}" })
+	public String customerInfo(@PathVariable(required = false) Integer pageid, Model model) {
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5;
+
+		List<Customer> customers = customerDao.getCustomersByPage(pageid, recordsPerPage);
+		int totalRecords = customerDao.countCustomers();
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		model.addAttribute("pageTitle", "Customer Information");
+		model.addAttribute("activePage", "customerInfo");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/CustomerInfo.jsp");
+		model.addAttribute("customers", customers);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+
+		return "Header";
+	}
+
+	@RequestMapping(value = { "/SearchCustomerInfo", "/SearchCustomerInfo/{pageid}" }, method = RequestMethod.GET)
+	public String searchCustomerInfo(@PathVariable(required = false) Integer pageid,
+			@RequestParam("searchQuery") String query, Model model) {
+		if (pageid == null) {
+			pageid = 1;
+		}
+
+		int recordsPerPage = 5;
+		List<Customer> customers = customerDao.searchCustomers(query, pageid, recordsPerPage);
+		int totalRecords = customerDao.countSearchResults(query);
+		int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+		model.addAttribute("customers", customers);
+		model.addAttribute("currentPage", pageid);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("searchQuery", query);
+		model.addAttribute("pageTitle", "Search Results");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/CustomerInfo.jsp");
+		model.addAttribute("activePage", "customerinfo");
+
+		return "Header";
+	}
+
+	@RequestMapping("/CustomerInsertpage")
+	public String customerInsertPage(Model model) {
+		model.addAttribute("pageTitle", "Add Customer");
+		model.addAttribute("activePage", "customerinsert");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/customerInsert.jsp");
+		return "Header";
+	}
+
+	@RequestMapping(value = "/CustomerInsert", method = RequestMethod.POST)
+	public String saveCustomer(@ModelAttribute("customer") Customer customer, Model model) {
+		int result = customerDao.save(customer);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Customer added successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to add customer!");
+		}
+		return "redirect:/CustomerInfo";
+	}
+
+	@RequestMapping("/CustomerEdit/{id}")
+	public String customerEditPage(@PathVariable int id, Model model) {
+		Customer customer = customerDao.getCustomerById(id);
+		model.addAttribute("customer", customer);
+		model.addAttribute("pageTitle", "Edit Customer");
+		model.addAttribute("activePage", "customeredit");
+		model.addAttribute("contentPage", "/WEB-INF/jsp/customerEdit.jsp");
+		return "Header";
+	}
+
+	@RequestMapping(value = "/CustomerUpdate", method = RequestMethod.POST)
+	public String updateCustomer(@ModelAttribute("customer") Customer customer, Model model) {
+		int result = customerDao.update(customer);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Customer updated successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to update customer!");
+		}
+		return "redirect:/CustomerInfo";
+	}
+
+	@RequestMapping("/CustomerDelete/{id}")
+	public String deleteCustomer(@PathVariable int id, Model model) {
+		int result = customerDao.delete(id);
+		if (result > 0) {
+			model.addAttribute("successMessage", "Customer deleted successfully!");
+		} else {
+			model.addAttribute("errorMessage", "Failed to delete customer!");
+		}
+		return "redirect:/CustomerInfo";
 	}
 
 	@RequestMapping("/Update")

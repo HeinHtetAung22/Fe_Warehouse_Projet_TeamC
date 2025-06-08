@@ -105,6 +105,11 @@ body {
 						class="nav-link ${activePage == 'supplierinfo' ? 'text-danger' : ''}">Supplier
 						Info</a>
 				</div>
+				<div class="nav-item ${activePage == 'customerInfo' ? 'active' : ''}">
+					<a href="${pageContext.request.contextPath}/CustomerInfo"
+						class="nav-link ${activePage == 'customerInfo' ? 'text-danger' : ''}">Customer Info
+						</a>
+				</div>
 				<div class="nav-item ${activePage == 'stockIn' ? 'active' : ''}">
 					<a href="${pageContext.request.contextPath}/StockInReport"
 						class="nav-link ${activePage == 'stockinreport' ? 'text-danger' : ''}">Stock
@@ -121,6 +126,8 @@ body {
 						class="nav-link ${activePage == 'stockbalancereport' ? 'text-danger' : ''}">Stock
 						Balance Report</a>
 				</div>
+				
+				
 				<div class="nav-item ${activePage == 'userInsert' ? 'active' : ''}">
 					<a href="${pageContext.request.contextPath}/UserInsert"
 						class="nav-link ${activePage == 'userinsert' ? 'text-danger' : ''}">User
