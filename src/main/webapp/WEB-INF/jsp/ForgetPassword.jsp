@@ -2,28 +2,9 @@
 	pageEncoding="UTF-8"%>
 <!-- Main Content (scrollable) -->
 <div class="main-content">
-	<div class="top-bar">
-		<div
-			class="search-container position-relative d-flex align-items-center">
-			<i class="fas fa-search position-absolute search-icon ms-3"></i> <input
-				type="search" class="form-control ps-5" placeholder="Search..." />
-			<div class="right-icons position-absolute end-0 pe-3">
-				<i class="fas fa-bell fa-lg me-3" style="cursor: pointer;"></i> <i
-					class="fas fa-user-circle fa-lg" style="cursor: pointer;"></i>
-			</div>
-		</div>
-	</div>
 
-	<div class="d-flex mb-3">
-		<div class="ms-auto">
-			<button class="btn btn-sm btn-primary mt-2">
-				<i class="fas fa-plus me-1"></i> Add New
-			</button>
-		</div>
-	</div>
-
-	<div class="card">
-		<div class="card-body forgot-password-form">
+	<div class="card" style="">
+		<div class="card-body forgot-password-form" >
 			<h2>Forgot Password</h2>
 			<form id="forgotPasswordForm">
 				<div class="mb-3">
