@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<div class="main-content">
+<div class="main-content" style="overflow-y: auto;">
     <div class="top-bar mb-3">
         <form id="searchForm" action="${pageContext.request.contextPath}/SearchStockOutInfo/1" method="get">
             <div class="search-container position-relative d-flex align-items-center">
@@ -22,11 +22,12 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                        	<th>NO</th>
                             <th>Out ID</th>
-                            <th>Stock ID</th>
+                            <th>Stock Name</th>
                             <th>Quantity</th>
                             <th>Date Out</th>
-                            <th>Customer</th>
+                            <th>Customer Name</th>
                             <th>Warehouse</th>
                             <th>Remarks</th>
                             <!-- <th>Actions</th> -->
@@ -51,13 +52,24 @@
                                 </tr>
                             </c:when>
                             <c:otherwise>
-                                <c:forEach var="stockOut" items="${stockOuts}">
+                                <c:forEach var="stockOut" items="${stockOuts}" varStatus="status">
                                     <tr>
+                                    <td>${(currentPage - 1) * 10 + status.index + 1}</td>
+                                        <!-- 
+                                          ========================================
+                                          SEQUENTIAL ROW NUMBER LOGIC:
+                                          - Formula: (currentPage - 1) * 10 + status.index + 1
+                                          - Example for Page 2:
+                                            - Row 1: (2-1)*10 + 0 + 1 = 11
+                                            - Row 2: (2-1)*10 + 1 + 1 = 12
+                                          - Ensures continuous numbering across pages.
+                                          ========================================
+                                        -->
                                         <td>${stockOut.outID}</td>
-                                        <td>${stockOut.stockID}</td>
+                                        <td>${stockOut.stockName}</td>
                                         <td>${stockOut.quantity}</td>
-                                        <td><fmt:formatDate value="${stockOut.dateOut}" pattern="yyyy-MM-dd" /></td>
-                                        <td>${stockOut.customerID}</td>
+                                        <td><fmt:formatDate value="${stockOut.dateOut}" pattern="MM-dd-yyyy" /></td>
+                                        <td>${stockOut.customerName}</td>
                                         <td>${stockOut.wareHouseID}</td>
                                         <td>${stockOut.remarks}</td>
                                         <!-- <td>

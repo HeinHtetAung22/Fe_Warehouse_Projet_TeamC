@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!-- Main Content -->
-<div class="main-content">
+<div class="main-content" style="overflow-y: auto;">
     <div class="top-bar mb-3">
         <form id="searchForm" action="${pageContext.request.contextPath}/SearchStockBalanceInfo/1" method="get">
             <div class="search-container position-relative d-flex align-items-center">
@@ -23,8 +23,9 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                        	<th>NO</th>
                             <th>Balance ID</th>
-                            <th>Stock ID</th>
+                            <th>Stock Name</th>
                             <th>Available Quantity</th>
                             <th>Last Updated</th>
                             <!-- <th>Actions</th> -->
@@ -49,12 +50,23 @@
                                 </tr>
                             </c:when>
                             <c:otherwise>
-                                <c:forEach var="balance" items="${stockBalances}">
+                                <c:forEach var="balance" items="${stockBalances}" varStatus="status">
                                     <tr>
+                                    <td>${(currentPage - 1) * 10 + status.index + 1}</td>
+                                        <!-- 
+                                          ========================================
+                                          SEQUENTIAL ROW NUMBER LOGIC:
+                                          - Formula: (currentPage - 1) * 10 + status.index + 1
+                                          - Example for Page 2:
+                                            - Row 1: (2-1)*10 + 0 + 1 = 11
+                                            - Row 2: (2-1)*10 + 1 + 1 = 12
+                                          - Ensures continuous numbering across pages.
+                                          ========================================
+                                        -->
                                         <td>${balance.balanceID}</td>
-                                        <td>${balance.stockID}</td>
+                                        <td>${balance.stockName}</td>
                                         <td>${balance.availableQty}</td>
-                                        <td><fmt:formatDate value="${balance.lastUpdated}" pattern="yyyy-MM-dd" /></td>
+                                        <td><fmt:formatDate value="${balance.lastUpdated}" pattern="MM-dd-yyyy" /></td>
                                         <!-- <td>
                                             <button class="btn btn-sm btn-outline-primary me-1">
                                                 <i class="fas fa-edit"></i>

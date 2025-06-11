@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="main-content">
+<div class="main-content" style="overflow-y: auto;">
     <div class="top-bar mb-3">
         <form id="searchForm" action="${pageContext.request.contextPath}/SearchCustomerInfo/1" method="get">
             <div class="search-container position-relative d-flex align-items-center">
@@ -33,7 +33,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>NO</th>
                             <th>Name</th>
                             <th>Phone</th>
                             <th>Address</th>
@@ -59,9 +59,19 @@
                                 </tr>
                             </c:when>
                             <c:otherwise>
-                                <c:forEach var="customer" items="${customers}">
+                                <c:forEach var="customer" items="${customers}" varStatus="status">
                                     <tr>
-                                        <td>${customer.formattedId}</td>
+                                         <td>CUS${(currentPage - 1) * 10 + status.index + 1}</td>
+                                        <!-- 
+                                          ========================================
+                                          SEQUENTIAL ROW NUMBER LOGIC:
+                                          - Formula: (currentPage - 1) * 10 + status.index + 1
+                                          - Example for Page 2:
+                                            - Row 1: (2-1)*10 + 0 + 1 = 11
+                                            - Row 2: (2-1)*10 + 1 + 1 = 12
+                                          - Ensures continuous numbering across pages.
+                                          ========================================
+                                        -->
                                         <td><strong>${customer.customerName}</strong></td>
                                         <td>${customer.customerPh}</td>
                                         <td>${customer.customerAddress}</td>

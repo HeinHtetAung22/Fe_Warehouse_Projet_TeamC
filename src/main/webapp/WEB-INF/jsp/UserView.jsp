@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="main-content">
+<div class="main-content" style="overflow-y: auto;">
     <div class="top-bar mb-3">
         <form id="searchForm" action="${pageContext.request.contextPath}/SearchCustomerInfo/1" method="get">
             <div class="search-container position-relative d-flex align-items-center">
