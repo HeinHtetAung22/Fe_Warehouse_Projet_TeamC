@@ -14,7 +14,72 @@
                     <i class="fas fa-user-circle fa-lg" style="cursor: pointer;"></i>
                 </div>
             </div>
+            <!-- Hidden fields for sorting parameters -->
+            <input type="hidden" name="sortField" id="sortField" value="${param.sortField}">
+            <input type="hidden" name="sortDirection" id="sortDirection" value="${param.sortDirection}">
+            <input type="hidden" name="yearFilter" id="yearFilter" value="${param.yearFilter}">
         </form>
+    </div>
+
+    <!-- Sorting Controls -->
+    <div class="d-flex mb-3">
+        <div class="d-flex">
+            <!-- Stock Name Sorting -->
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button" id="nameSortDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fas fa-sort-alpha-down"></i> Stock Name
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="nameSortDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="applySort('stockName', 'asc')">A to Z</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="applySort('stockName', 'desc')">Z to A</a></li>
+                </ul>
+            </div>
+
+            <!-- Date In Sorting -->
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button" id="dateSortDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fas fa-sort-numeric-down"></i> Date In
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dateSortDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="applySort('dateIn', 'desc')">Newest First</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="applySort('dateIn', 'asc')">Oldest First</a></li>
+                </ul>
+            </div>
+
+            <!-- Quantity Sorting -->
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button" id="quantitySortDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fas fa-sort-amount-down"></i> Quantity
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="quantitySortDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="applySort('quantity', 'desc')">High to Low</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="applySort('quantity', 'asc')">Low to High</a></li>
+                </ul>
+            </div>
+
+            <!-- Year Filter Dropdown -->
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button" id="yearFilterDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fas fa-calendar-alt"></i> Year
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="yearFilterDropdown">
+                    <li><a class="dropdown-item ${param.yearFilter == 'all' or empty param.yearFilter ? 'active' : ''}"
+                        href="?yearFilter=all&sortField=${param.sortField}&sortDirection=${param.sortDirection}&searchQuery=${searchQuery}">All Years</a></li>
+                    <c:forEach var="year" items="${availableYears}">
+                        <li><a class="dropdown-item ${param.yearFilter == year ? 'active' : ''}"
+                            href="?yearFilter=${year}&sortField=${param.sortField}&sortDirection=${param.sortDirection}&searchQuery=${searchQuery}">${year}</a></li>
+                    </c:forEach>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <div class="card">
@@ -23,15 +88,38 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                        	<th>NO</th>
+                            <th>NO</th>
                             <th>In ID</th>
-                            <th>Stock Name</th>
-                            <th>Quantity</th>
-                            <th>Date In</th>
+                            <th><a href="?sortField=stockName&sortDirection=${param.sortField == 'stockName' && param.sortDirection == 'asc' ? 'desc' : 'asc'}&searchQuery=${searchQuery}&yearFilter=${param.yearFilter}">
+                                Stock Name
+                                <c:if test="${param.sortField == 'stockName'}">
+                                    <i class="fas fa-sort-${param.sortDirection == 'asc' ? 'up' : 'down'} ms-1"></i>
+                                </c:if>
+                                <c:if test="${param.sortField != 'stockName'}">
+                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                </c:if>
+                            </a></th>
+                            <th><a href="?sortField=quantity&sortDirection=${param.sortField == 'quantity' && param.sortDirection == 'asc' ? 'desc' : 'asc'}&searchQuery=${searchQuery}&yearFilter=${param.yearFilter}">
+                                Quantity
+                                <c:if test="${param.sortField == 'quantity'}">
+                                    <i class="fas fa-sort-${param.sortDirection == 'asc' ? 'up' : 'down'} ms-1"></i>
+                                </c:if>
+                                <c:if test="${param.sortField != 'quantity'}">
+                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                </c:if>
+                            </a></th>
+                            <th><a href="?sortField=dateIn&sortDirection=${param.sortField == 'dateIn' && param.sortDirection == 'asc' ? 'desc' : 'asc'}&searchQuery=${searchQuery}&yearFilter=${param.yearFilter}">
+                                Date In
+                                <c:if test="${param.sortField == 'dateIn'}">
+                                    <i class="fas fa-sort-${param.sortDirection == 'asc' ? 'up' : 'down'} ms-1"></i>
+                                </c:if>
+                                <c:if test="${param.sortField != 'dateIn'}">
+                                    <i class="fas fa-sort ms-1 text-muted"></i>
+                                </c:if>
+                            </a></th>
                             <th>Supplier Name</th>
                             <th>Warehouse</th>
                             <th>Remarks</th>
-                           <!--  <th>Actions</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -91,6 +179,7 @@
                 </table>
             </div>
 
+            <!-- Update pagination to include all parameters -->
             <c:if test="${not empty stockIns and totalPages > 1}">
                 <div class="d-flex justify-content-center mt-3">
                     <nav aria-label="Page navigation">
@@ -99,14 +188,14 @@
                                 <c:choose>
                                     <c:when test="${not empty searchQuery}">
                                         <a class="page-link"
-                                           href="${pageContext.request.contextPath}/SearchStockInInfo/${currentPage - 1}?searchQuery=${searchQuery}"
+                                           href="${pageContext.request.contextPath}/SearchStockInInfo/${currentPage - 1}?searchQuery=${searchQuery}&sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}"
                                            aria-label="Previous">
                                             <span aria-hidden="true">«</span>
                                         </a>
                                     </c:when>
                                     <c:otherwise>
                                         <a class="page-link"
-                                           href="${pageContext.request.contextPath}/StockInReport/${currentPage - 1}"
+                                           href="${pageContext.request.contextPath}/StockInReport/${currentPage - 1}?sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}"
                                            aria-label="Previous">
                                             <span aria-hidden="true">«</span>
                                         </a>
@@ -119,11 +208,15 @@
                                     <c:choose>
                                         <c:when test="${not empty searchQuery}">
                                             <a class="page-link"
-                                               href="${pageContext.request.contextPath}/SearchStockInInfo/${i}?searchQuery=${searchQuery}">${i}</a>
+                                               href="${pageContext.request.contextPath}/SearchStockInInfo/${i}?searchQuery=${searchQuery}&sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}">
+                                                ${i}
+                                            </a>
                                         </c:when>
                                         <c:otherwise>
                                             <a class="page-link"
-                                               href="${pageContext.request.contextPath}/StockInReport/${i}">${i}</a>
+                                               href="${pageContext.request.contextPath}/StockInReport/${i}?sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}">
+                                                ${i}
+                                            </a>
                                         </c:otherwise>
                                     </c:choose>
                                 </li>
@@ -133,14 +226,14 @@
                                 <c:choose>
                                     <c:when test="${not empty searchQuery}">
                                         <a class="page-link"
-                                           href="${pageContext.request.contextPath}/SearchStockInInfo/${currentPage + 1}?searchQuery=${searchQuery}"
+                                           href="${pageContext.request.contextPath}/SearchStockInInfo/${currentPage + 1}?searchQuery=${searchQuery}&sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}"
                                            aria-label="Next">
                                             <span aria-hidden="true">»</span>
                                         </a>
                                     </c:when>
                                     <c:otherwise>
                                         <a class="page-link"
-                                           href="${pageContext.request.contextPath}/StockInReport/${currentPage + 1}"
+                                           href="${pageContext.request.contextPath}/StockInReport/${currentPage + 1}?sortField=${param.sortField}&sortDirection=${param.sortDirection}&yearFilter=${param.yearFilter}"
                                            aria-label="Next">
                                             <span aria-hidden="true">»</span>
                                         </a>
@@ -162,12 +255,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent the default form submission
-            searchForm.action = `${pageContext.request.contextPath}/SearchStockInInfo/1`; // Set the action to the first page of search results
+            event.preventDefault();
+            searchForm.action = `${pageContext.request.contextPath}/SearchStockInInfo/1`;
             searchForm.submit();
         }
     });
 });
+
+// Apply sorting parameters and submit form
+function applySort(field, direction) {
+    document.getElementById('sortField').value = field;
+    document.getElementById('sortDirection').value = direction;
+
+    // Preserve search query if it exists
+    const searchQuery = "${searchQuery}";
+    if (searchQuery) {
+        document.getElementById('searchInput').value = searchQuery;
+    }
+
+    document.getElementById('searchForm').submit();
+}
+
+// Apply year filter and submit form
+function applyYearFilter(year) {
+    document.getElementById('yearFilter').value = year;
+    document.getElementById('searchForm').submit();
+}
 </script>
 
 <style>
@@ -177,5 +290,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .table tbody tr td.text-center {
     vertical-align: middle;
+}
+
+/* Style for active sorting indicator */
+.fa-sort-up, .fa-sort-down {
+    color: #0d6efd;
 }
 </style>
